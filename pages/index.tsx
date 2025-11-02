@@ -1,24 +1,35 @@
-import Link from 'next/link';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import PropertyCard from '@/components/property/PropertyCard'; // Assume this component exists
 
 export default function Home() {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await axios.get('/api/properties');
+        setProperties(response.data);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            ALX Listing App 03
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Booking Detail Page with User Input and Payment Processing
-          </p>
-          <Link 
-            href="/booking"
-            className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 inline-block"
-          >
-            Go to Booking Page
-          </Link>
-        </div>
-      </div>
+    <div className="grid grid-cols-3 gap-4">
+      {properties.map((property) => (
+        <PropertyCard key={property.id} property={property} />
+      ))}
     </div>
   );
 }
