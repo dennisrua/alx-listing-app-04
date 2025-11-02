@@ -1,24 +1,43 @@
-import Link from 'next/link';
+import axios from 'axios';
+import { useState } from 'react';
 
-export default function Home() {
+export default function BookingForm() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    cardNumber: '',
+    expirationDate: '',
+    cvv: '',
+    billingAddress: '',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post('/api/bookings', formData);
+      alert('Booking confirmed!');
+    } catch (error) {
+      setError('Failed to submit booking.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            ALX Listing App 03
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Booking Detail Page with User Input and Payment Processing
-          </p>
-          <Link 
-            href="/booking"
-            className="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 inline-block"
-          >
-            Go to Booking Page
-          </Link>
-        </div>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit}>
+      {/* Form fields for booking details */}
+      <button type="submit" disabled={loading}>
+        {loading ? 'Processing...' : 'Confirm & Pay'}
+      </button>
+      {error && <p className="text-red-500">{error}</p>}
+    </form>
   );
 }
